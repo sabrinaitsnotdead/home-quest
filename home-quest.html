@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0e17;
+  --surface: #1a1928;
+  --surface2: #231f38;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #fffffe;
+  --muted: rgba(255,255,255,0.45);
+  --purple: #a78bfa;
+  --purple-dim: #7c5cbf;
+  --purple-bg: rgba(167,139,250,0.12);
+  --purple-glow: rgba(167,139,250,0.25);
+  --green: #34d399;
+  --green-bg: rgba(52,211,153,0.1);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --coral: #f87171;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 0 6rem;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,92,191,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 80%, rgba(52,211,153,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; padding: 0 20px; }
+
+/* Header */
+.header {
+  padding: 28px 20px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+}
+
+.logo span { color: var(--purple); }
+
+.level-pill {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  background: var(--purple-bg);
+  color: var(--purple);
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: 999px;
+}
+
+.xp-section { margin-bottom: 6px; }
+.xp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.xp-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.xp-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--purple);
+}
+.xp-track {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple-dim), var(--purple));
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+.xp-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 8px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 999px;
+  filter: blur(2px);
+}
+
+/* Stats row */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 0 20px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  text-align: center;
+}
+.stat-n {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-l {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* Streak */
+.streak {
+  margin: 0 20px 24px;
+  padding: 14px 16px;
+  background: var(--amber-bg);
+  border: 1px solid rgba(251,191,36,0.2);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+.streak-icon { font-size: 24px; }
+.streak-text { font-size: 13px; color: var(--amber); line-height: 1.4; }
+.streak-text b { font-weight: 600; }
+
+/* Section header */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.section-head::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--purple);
+  border-radius: 2px;
+}
+
+/* Day tabs */
+.tabs-wrap {
+  padding: 0 20px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab:hover { border-color: var(--border2); color: var(--text); }
+.tab.active {
+  background: var(--purple-bg);
+  border-color: rgba(167,139,250,0.4);
+  color: var(--purple);
+  font-weight: 600;
+}
+
+/* Day content */
+.day-wrap {
+  padding: 0 20px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+.day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.day-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.day-emoji { font-size: 20px; }
+.day-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+}
+.day-done-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: var(--green-bg);
+  color: var(--green);
+  border-radius: 999px;
+  border: 1px solid rgba(52,211,153,0.25);
+}
+
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.task:hover { border-color: var(--border2); }
+.task:active { transform: scale(0.98); }
+.task.done {
+  opacity: 0.45;
+  background: var(--surface);
+}
+
+.task-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+.task.done .task-check {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: white;
+}
+.task-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+  transition: all 0.2s;
+}
+.task.done .task-name {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.task-xp {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--purple);
+  font-family: 'Syne', sans-serif;
+}
+
+/* Daily habits */
+.daily-wrap {
+  padding: 0 20px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+.daily-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.daily-task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.daily-task:hover { border-color: var(--border2); }
+.daily-task:active { transform: scale(0.98); }
+.daily-task.done { opacity: 0.45; }
+.daily-check {
+  font-size: 18px;
+  color: var(--border2);
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.daily-task.done .daily-check { color: var(--green); }
+.daily-name {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  line-height: 1.3;
+}
+.daily-task.done .daily-name {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.daily-xp {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  font-family: 'Syne', sans-serif;
+}
+
+/* Badges */
+.badges-wrap {
+  padding: 0 20px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.badge {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 10px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.badge.unlocked {
+  border-color: rgba(167,139,250,0.3);
+  background: var(--purple-bg);
+}
+.badge.locked { filter: grayscale(1); opacity: 0.35; }
+.badge-icon { font-size: 26px; margin-bottom: 6px; }
+.badge-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  margin-bottom: 2px;
+}
+.badge-desc { font-size: 10px; color: var(--muted); line-height: 1.3; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface2);
+  border: 1px solid var(--purple-glow);
+  color: var(--purple);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+  box-shadow: 0 4px 24px var(--purple-glow);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: rgba(15,14,23,0.92);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 12px 20px 20px;
+  gap: 4px;
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.15s;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: 'Syne', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--purple); }
+.nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Views */
+.view { display: none; }
+.view.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🏡 Home<span>Quest</span></div>
+    <div class="level-pill" id="level-pill">Nível 1 — Aprendiz</div>
+  </div>
+  <div class="xp-section">
+    <div class="xp-row">
+      <span class="xp-label">Progresso</span>
+      <span class="xp-val" id="xp-display">0 / 100 XP</span>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- MISSÕES VIEW -->
+<div class="view active" id="view-missoes">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-n" id="stat-total">0</div>
+      <div class="stat-l">feitas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="stat-xp">0</div>
+      <div class="stat-l">XP total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="stat-streak">0🔥</div>
+      <div class="stat-l">sequência</div>
+    </div>
+  </div>
+
+  <div class="streak" id="streak-bar">
+    <div class="streak-icon">🔥</div>
+    <div class="streak-text" id="streak-text">Complete os hábitos de hoje para começar sua sequência!</div>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="section-head">Semana</div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="day-wrap" id="day-content"></div>
+
+</div>
+
+<!-- HÁBITOS VIEW -->
+<div class="view" id="view-habitos">
+  <div class="daily-wrap" style="padding-top: 8px;">
+    <div class="section-head">Hábitos diários</div>
+    <div class="daily-grid" id="daily-grid"></div>
+  </div>
+</div>
+
+<!-- CONQUISTAS VIEW -->
+<div class="view" id="view-conquistas">
+  <div class="badges-wrap" style="padding-top: 8px;">
+    <div class="section-head">Conquistas</div>
+    <div class="badge-grid" id="badge-grid"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<nav class="bottom-nav">
+  <div class="nav-btn active" id="nav-missoes" onclick="switchView('missoes')">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Missões
+  </div>
+  <div class="nav-btn" id="nav-habitos" onclick="switchView('habitos')">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Hábitos
+  </div>
+  <div class="nav-btn" id="nav-conquistas" onclick="switchView('conquistas')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+    Conquistas
+  </div>
+</nav>
+
+<script>
+const DAYS = [
+  { id:'seg', label:'Seg', emoji:'🧹', name:'Segunda', tasks:[
+    {name:'Limpar bancadas da cozinha', xp:10},
+    {name:'Limpar fogão após o uso', xp:10},
+    {name:'Trocar pano de prato', xp:5},
+    {name:'Descer o lixo', xp:7},
+    {name:'Dobrar e guardar roupas', xp:10},
+    {name:'Lavar roupa de cama + roupa Sky', xp:12},
+  ]},
+  { id:'ter', label:'Ter', emoji:'🚿', name:'Terça', tasks:[
+    {name:'Limpar pias e torneiras', xp:10},
+    {name:'Limpar espelhos', xp:8},
+    {name:'Trocar toalhas', xp:5},
+    {name:'Lavar toalhas', xp:10},
+    {name:'Lavar prato de água da Sky', xp:6},
+  ]},
+  { id:'qua', label:'Qua', emoji:'📦', name:'Quarta', tasks:[
+    {name:'Guardar objetos fora do lugar', xp:8},
+    {name:'Organizar mesa de jantar', xp:8},
+    {name:'Organizar escritório', xp:10},
+    {name:'Esvaziar lixeiras menores', xp:5},
+    {name:'Descer o lixo', xp:7},
+  ]},
+  { id:'qui', label:'Qui', emoji:'👕', name:'Quinta', tasks:[
+    {name:'Recolher roupas secas', xp:8},
+    {name:'Recolher toalhas do varal', xp:7},
+  ]},
+  { id:'sex', label:'Sex', emoji:'✨', name:'Sexta', tasks:[
+    {name:'Limpar vaso sanitário', xp:12},
+    {name:'Limpar pia e torneira', xp:10},
+    {name:'Limpar espelho e box', xp:10},
+    {name:'Limpar gabinete do banheiro', xp:8},
+    {name:'Limpar fogão e micro-ondas', xp:12},
+    {name:'Limpar bancadas e mesa', xp:10},
+    {name:'Limpar geladeira por fora', xp:8},
+    {name:'Tirar pó da sala', xp:8},
+    {name:'Aspirar/varrer e passar pano', xp:15},
+    {name:'Trocar roupa de cama', xp:12},
+    {name:'Limpar quarto e escritório', xp:10},
+  ]},
+  { id:'sab', label:'Sáb', emoji:'🫧', name:'Sábado', tasks:[
+    {name:'Separar e lavar roupas', xp:12},
+    {name:'Estender roupas', xp:8},
+    {name:'Limpar filtro da máquina', xp:10},
+    {name:'Organizar lavanderia', xp:8},
+    {name:'Regar plantas', xp:6},
+    {name:'Lavar prato de água da Sky', xp:6},
+  ]},
+  { id:'dom', label:'Dom', emoji:'☀️', name:'Domingo', tasks:[
+    {name:'Descansar (XP grátis! 🎁)', xp:20},
+  ]},
+];
+
+const DAILY = [
+  {name:'Fazer a cama', xp:8},
+  {name:'Lavar a louça', xp:8},
+  {name:'Limpar bancada', xp:5},
+  {name:'Guardar objetos', xp:5},
+];
+
+const LEVELS = [
+  {min:0, max:100, name:'Aprendiz'},
+  {min:100, max:250, name:'Escudeiro'},
+  {min:250, max:500, name:'Guarda da Casa'},
+  {min:500, max:900, name:'Mestre Doméstico'},
+  {min:900, max:1500, name:'Herói do Lar'},
+  {min:1500, max:99999, name:'Lenda da Limpeza'},
+];
+
+const BADGES = [
+  {id:'first', icon:'⭐', name:'1ª missão', desc:'Complete 1 tarefa', req:s=>s.total>=1},
+  {id:'streak3', icon:'🔥', name:'3 dias seguidos', desc:'Streak de 3 dias', req:s=>s.streak>=3},
+  {id:'xp100', icon:'⚡', name:'Centenária', desc:'Acumule 100 XP', req:s=>s.xp>=100},
+  {id:'week', icon:'📅', name:'Semana completa', desc:'Complete 7 dias', req:s=>s.daysCompleted>=7},
+  {id:'daily7', icon:'🔄', name:'Rotina sagrada', desc:'7x hábitos completos', req:s=>s.dailyCompletes>=7},
+  {id:'xp500', icon:'👑', name:'Realeza', desc:'Acumule 500 XP', req:s=>s.xp>=500},
+];
+
+let state = (() => {
+  try { return JSON.parse(localStorage.getItem('hq2_state')) || null; } catch(e) { return null; }
+})() || { xp:0, total:0, streak:0, daysCompleted:0, dailyCompletes:0, checked:{}, dailyChecked:[], lastDaily:null };
+
+const todayIdx = () => { const d = new Date().getDay(); return d === 0 ? 6 : d - 1; };
+let activeDay = DAYS[todayIdx()].id;
+let currentView = 'missoes';
+
+function save() {
+  try { localStorage.setItem('hq2_state', JSON.stringify(state)); } catch(e) {}
+}
+
+function getLevel() {
+  let lv = 0;
+  LEVELS.forEach((l,i) => { if(state.xp >= l.min) lv = i; });
+  return { index: lv+1, ...LEVELS[lv] };
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function updateHeader() {
+  const lv = getLevel();
+  document.getElementById('level-pill').textContent = 'Nível ' + lv.index + ' — ' + lv.name;
+  const pct = Math.min(100, Math.round(((state.xp - lv.min) / (lv.max - lv.min)) * 100));
+  document.getElementById('xp-fill').style.width = pct + '%';
+  document.getElementById('xp-display').textContent = state.xp + ' / ' + lv.max + ' XP';
+  document.getElementById('stat-total').textContent = state.total;
+  document.getElementById('stat-xp').textContent = state.xp;
+  document.getElementById('stat-streak').textContent = state.streak + '🔥';
+  const st = document.getElementById('streak-text');
+  if (state.streak === 0) {
+    st.innerHTML = 'Complete os hábitos de hoje para começar sua sequência!';
+  } else {
+    st.innerHTML = '<b>' + state.streak + ' dias seguidos!</b> Não quebre a corrente 💪';
+  }
+}
+
+function renderTabs() {
+  const c = document.getElementById('tabs');
+  c.innerHTML = '';
+  DAYS.forEach(d => {
+    const t = document.createElement('div');
+    t.className = 'tab' + (d.id === activeDay ? ' active' : '');
+    t.textContent = d.label;
+    t.onclick = () => { activeDay = d.id; renderTabs(); renderDay(); };
+    c.appendChild(t);
+  });
+}
+
+function renderDay() {
+  const day = DAYS.find(d => d.id === activeDay);
+  const checked = state.checked[day.id] || [];
+  const allDone = checked.length === day.tasks.length;
+  const c = document.getElementById('day-content');
+  c.innerHTML = '';
+
+  const head = document.createElement('div');
+  head.className = 'day-head';
+  head.innerHTML = `
+    <div class="day-title-row">
+      <span class="day-emoji">${day.emoji}</span>
+      <span class="day-name">${day.name}</span>
+    </div>
+    ${allDone ? '<span class="day-done-badge">✓ Completo</span>' : ''}
+  `;
+  c.appendChild(head);
+
+  const list = document.createElement('div');
+  list.className = 'task-list';
+  day.tasks.forEach((task, i) => {
+    const done = checked.includes(i);
+    const el = document.createElement('div');
+    el.className = 'task' + (done ? ' done' : '');
+    el.innerHTML = `
+      <div class="task-check">${done ? '✓' : ''}</div>
+      <span class="task-name">${task.name}</span>
+      <span class="task-xp">+${task.xp}</span>
+    `;
+    el.onclick = () => toggleTask(day.id, i, task.xp, day);
+    list.appendChild(el);
+  });
+  c.appendChild(list);
+}
+
+function toggleTask(dayId, taskIdx, xp, day) {
+  if (!state.checked[dayId]) state.checked[dayId] = [];
+  const idx = state.checked[dayId].indexOf(taskIdx);
+  if (idx === -1) {
+    state.checked[dayId].push(taskIdx);
+    state.xp += xp;
+    state.total += 1;
+    toast('+' + xp + ' XP ⚡');
+    if (state.checked[dayId].length === day.tasks.length) {
+      state.daysCompleted = Object.keys(state.checked).filter(k => {
+        const d = DAYS.find(dd => dd.id === k);
+        return d && state.checked[k].length === d.tasks.length;
+      }).length;
+      state.xp += 20;
+      setTimeout(() => toast('🎉 Dia completo! +20 XP bônus!'), 500);
+    }
+  } else {
+    state.checked[dayId].splice(idx, 1);
+    state.xp = Math.max(0, state.xp - xp);
+    state.total = Math.max(0, state.total - 1);
+  }
+  save(); updateHeader(); renderDay(); renderBadges();
+}
+
+function renderDaily() {
+  const today = new Date().toDateString();
+  if (state.lastDaily !== today) { state.dailyChecked = []; state.lastDaily = today; save(); }
+  const grid = document.getElementById('daily-grid');
+  grid.innerHTML = '';
+  DAILY.forEach((task, i) => {
+    const done = state.dailyChecked.includes(i);
+    const el = document.createElement('div');
+    el.className = 'daily-task' + (done ? ' done' : '');
+    el.innerHTML = `
+      <span class="daily-check">${done ? '✅' : '⬜'}</span>
+      <span class="daily-name">${task.name}</span>
+      <span class="daily-xp">+${task.xp}</span>
+    `;
+    el.onclick = () => {
+      const idx = state.dailyChecked.indexOf(i);
+      if (idx === -1) {
+        state.dailyChecked.push(i);
+        state.xp += task.xp;
+        state.total += 1;
+        toast('+' + task.xp + ' XP ⚡');
+        if (state.dailyChecked.length === DAILY.length) {
+          state.streak += 1;
+          state.dailyCompletes += 1;
+          setTimeout(() => toast('🔥 Streak ' + state.streak + '! Hábitos completos!'), 500);
+        }
+      } else {
+        state.dailyChecked.splice(idx, 1);
+        state.xp = Math.max(0, state.xp - task.xp);
+        state.total = Math.max(0, state.total - 1);
+      }
+      save(); updateHeader(); renderDaily(); renderBadges();
+    };
+    grid.appendChild(el);
+  });
+}
+
+function renderBadges() {
+  const grid = document.getElementById('badge-grid');
+  grid.innerHTML = '';
+  BADGES.forEach(b => {
+    const unlocked = b.req(state);
+    const el = document.createElement('div');
+    el.className = 'badge' + (unlocked ? ' unlocked' : ' locked');
+    el.innerHTML = `<div class="badge-icon">${b.icon}</div><div class="badge-name">${b.name}</div><div class="badge-desc">${b.desc}</div>`;
+    grid.appendChild(el);
+  });
+}
+
+function switchView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.getElementById('nav-' + v).classList.add('active');
+  if (v === 'habitos') renderDaily();
+  if (v === 'conquistas') renderBadges();
+}
+
+renderTabs();
+renderDay();
+renderDaily();
+renderBadges();
+updateHeader();
+</script>
+</body>
+</html>
